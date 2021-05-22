@@ -8,7 +8,7 @@ import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
 import numpy as np
-from datalist import processors
+from datalist import processors,os,camera
 
 engine = create_engine('sqlite:///project_db.sqlite3')
 Session = sessionmaker(bind=engine)
@@ -16,13 +16,13 @@ sess = Session()
 
 st.title('Competitive Mobile Price Prediction for E-Commerce')
 
-op_sys= st.text_area('Enter Operating System with version, ex: Android 11')
+op_sys= st.selectbox('Enter Operating System with version, ex: Android 11',options=os)
 proc_brand= st.selectbox('Select a processsor: Qualcomm Snapdragon 730G',options=processors)
 #batt_pow_mah=  st.number_input('Battery power in MaH')
 batt_pow_mah = st.slider("Battery power in MaH", 22, 9000)
 ratings= st.number_input('Rating',min_value=1.0,max_value=5.0,value=3.0)
 storage= st.number_input('Inbuilt storage in GB')
-cam_feat=st.text_area('Camera Featires')
+cam_feat=st.selectbox('Camera Featires',options=camera)
 
 submit=st.button("Make Prediction")
 
@@ -73,11 +73,11 @@ if submit and op_sys and proc_brand and batt_pow_mah and storage:
         inpX = np.hstack([os,brand,X,camera,])
         inpX = np.hstack([inpX,np.array(storage)])
         iX=sc.transform(inpX.reshape(1,-1))
-        st.write(iX)
-        st.write(iX.shape)
+        #st.write(iX)
+        #st.write(iX.shape)
         entry2=xgb.DMatrix(data=iX)
         p=loaded_model.predict(entry2)
-        st.write(f"Generating your result...{p[0]}")
+        st.write(f" ₹ {int(p[0])}")
     #except Exception as e:
         # st.error(f"Some error occured : {e}")
 
